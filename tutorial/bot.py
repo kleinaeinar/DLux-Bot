@@ -22,7 +22,7 @@ def get_prefix(client, message):
 Link to youtube tutorials; https://www.youtube.com/channel/UCR-zOCvDCayyYy1flR5qaAg
 Link to discord.py doc; https://discordpy.readthedocs.io/en/latest/index.html
 Link to discord dev portal; https://discordapp.com/developers/applications
-Link to learn more python; https://realpython.com/
+Link to learn more python; https://realpython.co
 """
 
 """
