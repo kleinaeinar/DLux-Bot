@@ -4,6 +4,8 @@ from itertools import cycle
 import datetime as DT
 from datetime import time
 
+
+
 class Information(commands.Cog):
 
 
@@ -68,13 +70,6 @@ class Information(commands.Cog):
         embed.set_footer(text=time_date_now)
 
         await author.send(embed=embed)
-
-    @commands.command()
-    async def time(self, ctx):
-        await ctx.send(f'The current time in GMT is: {time_now}')
-
-
-
 
 def setup(client):
     client.add_cog(Information(client))
