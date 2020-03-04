@@ -64,6 +64,7 @@ async def on_guild_remove(guild):
 
 @tasks.loop(seconds=30)
 async def change_status():
+    time_date_now = DT.datetime.now().strftime('Date: %d-%m-%Y\nTime: %H:%M:%S')
     await client.change_presence(activity=discord.Game(f'Ping: {round(client.latency * 1000)}ms'))
     print(time_date_now)
     print(f'Ping: {round(client.latency * 1000)}ms\n---------------------------')
