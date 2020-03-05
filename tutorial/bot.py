@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from itertools import cycle
 import asyncio
 import datetime as DT
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -65,6 +66,7 @@ async def on_guild_remove(guild):
 @tasks.loop(seconds=30)
 async def change_status():
     await client.change_presence(activity=discord.Game(f'Ping: {round(client.latency * 1000)}ms'))
+    time_date_now = DT.datetime.now().strftime('Date: %d-%m-%Y\nTime: %H:%M:%S')
     print(time_date_now)
     print(f'Ping: {round(client.latency * 1000)}ms\n---------------------------')
 
