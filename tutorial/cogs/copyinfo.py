@@ -10,8 +10,8 @@ from utilities import utils
 
 class Information(commands.Cog):
 
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, client):
+        self.client = client
 
     @commands.command(name="about", aliases=["info"])
     async def about(self, ctx):
@@ -19,29 +19,28 @@ class Information(commands.Cog):
         Get information about the bot.
         """
 
-        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(self.bot, ctx)
+        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(self.client, ctx)
         files, functions, comments, lines, classes = utils.linecount()
 
-        embed = discord.Embed(
-            colour=discord.Color.gold(),
-        )
-        embed.set_author(icon_url=self.bot.user.avatar_url_as(format="png"), name=f"{self.bot.user.name}'s Info")
-        embed.set_thumbnail(url=self.bot.user.avatar_url_as(format="png"))
-        embed.set_footer(text=f"ID: {self.bot.user.id}")
-        embed.description = "Life is a discord bot coded by <@238356301439041536>"
-        embed.add_field(name="__**Bot info:**__", value=f"**Uptime:** {utils.format_time(self.bot.uptime)}\n"
-                                                        f"**Total users:** {len(self.bot.users)}\n"
-                                                        f"**Guilds:** {len(self.bot.guilds)}")
+        embed = discord.Embed(colour=discordColour(1080748))
+
+        embed.set_author(icon_url=ctx.client.user.avatar_url_as(format="png"), name=f"{self.client.user.name}'s Info")
+        embed.set_thumbnail(url=ctx.client.user.avatar_url_as(format="png"))
+        embed.set_footer(text=f"ID: {self.client.user.id}")
+        embed.description = "This discord bot is coded by <@221070014252449792>"
+        embed.add_field(name="__**Bot info:**__", value=f"**Uptime:** {utils.format_time(self.client.uptime)}\n"
+                                                        f"**Total users:** {len(self.client.users)}\n"
+                                                        f"**Guilds:** {len(self.client.guilds)}")
         embed.add_field(name="\u200B", value="\u200B")
         embed.add_field(name="__**Stats:**__", value=f"**Discord.py Version:** {str(discord.__version__)}\n"
-                                                     f"**Commands:** {len(self.bot.commands)}\n"
-                                                     f"**Cogs:** {len(self.bot.cogs)}")
+                                                     f"**Commands:** {len(self.client.commands)}\n"
+                                                     f"**Cogs:** {len(self.client.cogs)}")
         embed.add_field(name="__**Code:**__", value=f"**Comments:** {comments}\n**Functions:** {functions}\n"
                                                     f"**Classes:** {classes}\n**Lines:** {lines}\n**Files:** {files}\n")
         embed.add_field(name="\u200B", value="\u200B")
         embed.add_field(name="__**Ping:**__", value=f"**Average Lat:** {average_latency_ms}\n**Latency:** {latency_ms}\n"
                                                     f"**Typing:** {typing_ms}\n**Discord:** {discord_ms}")
-        embed.add_field(name="__**Links:**__", value=f"**[Bot Invite](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=103926848)** | "
+        embed.add_field(name="__**Links:**__", value=f"**[Bot Invite](https://discordapp.com/oauth2/authorize?client_id={self.client.user.id}&scope=bot&permissions=103926848)** | "
                                                      f"**[Support server](https://discord.gg/xP8xsHr)** | "
                                                      f"**[Source code](https://github.com/iDevision/Life)**", inline=False)
         return await ctx.send(embed=embed)
@@ -55,8 +54,8 @@ class Information(commands.Cog):
         embed = discord.Embed(
             colour=discord.Color.gold(),
         )
-        embed.set_author(icon_url=self.bot.user.avatar_url_as(format="png"), name=f"{self.bot.user.name}'s system stats")
-        embed.set_thumbnail(url=self.bot.user.avatar_url_as(format="png"))
+        embed.set_author(icon_url=ctx.client.user.avatar_url_as(format="png"), name=f"{self.client.user.name}'s system stats")
+        embed.set_thumbnail(url=ctx.client.user.avatar_url_as(format="png"))
         embed.add_field(name="__**System CPU:**__", value=f"**Cores:** {psutil.cpu_count()}\n"
                                                           f"**Usage:** {psutil.cpu_percent(interval=0.1)}%\n"
                                                           f"**Frequency:** {round(psutil.cpu_freq().current, 2)} Mhz")
@@ -68,9 +67,9 @@ class Information(commands.Cog):
                                                            f"**Used:** {round(psutil.disk_usage('/').used / 1073741824, 2)} GB\n"
                                                            f"**Free:** {round(psutil.disk_usage('/').free / 1073741824, 2)} GB")
         embed.add_field(name="\u200B", value="\u200B")
-        embed.add_field(name="__**Process information:**__", value=f"**Memory usage:** {round(self.bot.process.memory_full_info().rss / 1048576, 2)} mb\n"
-                                                                   f"**CPU usage:** {self.bot.process.cpu_percent()}%\n"
-                                                                   f"**Threads:** {self.bot.process.num_threads()}")
+        embed.add_field(name="__**Process information:**__", value=f"**Memory usage:** {round(self.client.process.memory_full_info().rss / 1048576, 2)} mb\n"
+                                                                   f"**CPU usage:** {self.client.process.cpu_percent()}%\n"
+                                                                   f"**Threads:** {self.client.process.num_threads()}")
         return await ctx.send(embed=embed)
 
     @commands.command(name="ping")
@@ -79,7 +78,7 @@ class Information(commands.Cog):
         Gets the bots ping.
         """
 
-        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(self.bot, ctx)
+        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(client, ctx)
         return await ctx.send(f"```py\n"
                               f"Type         |Ping\n"
                               f"Average Lat. |{average_latency_ms}\n"
@@ -88,24 +87,6 @@ class Information(commands.Cog):
                               f"Discord      |{discord_ms}\n"
                               f"```")
 
-    @commands.command(name="source")
-    async def source(self, ctx, *, command: str = None):
-        """
-        Get a github link to the source of a command.
-        `command`: The name of the command you want the source for.
-        """
-
-        if command is None:
-            return await ctx.send(f"<https://github.com/iDevision/Life>")
-        obj = self.bot.get_command(command.replace(".", " "))
-        if obj is None:
-            return await ctx.send("I could not find that command.")
-        src = obj.callback.__code__
-        lines, firstlineno = inspect.getsourcelines(src)
-        location = ""
-        if not obj.callback.__module__.startswith("discord"):
-            location = os.path.relpath(src.co_filename).replace("\\", "/")
-        return await ctx.send(f"<https://github.com/iDevision/Life/blob/master/Life/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>")
 
     @commands.command(name="avatar")
     async def avatar(self, ctx, *, member: discord.Member = None):
@@ -152,10 +133,10 @@ class Information(commands.Cog):
         embed.add_field(name="__**General information:**__", value=f"**Owner:** {ctx.guild.owner}\n"
                                                                    f"**Server created at:** {ctx.guild.created_at.__format__('%A %d %B %Y at %H:%M')}\n"
                                                                    f"**Members:** {ctx.guild.member_count} |"
-                                                                   f"<:online:627627415224713226>{online} |"
-                                                                   f"<:away:627627415119724554>{idle} |"
-                                                                   f"<:dnd:627627404784828416>{dnd} |"
-                                                                   f"<:offline:627627415144890389>{offline}\n"
+                                                                   f"**Online:** {online} |"
+                                                                   f"**Away:** {idle} |"
+                                                                   f"**DnD:** {dnd} |"
+                                                                   f"**Offline:** {offline}\n"
                                                                    f"**Verification level:** {utils.guild_verification_level(ctx.guild)}\n"
                                                                    f"**Content filter level:** {utils.guild_content_filter_level(ctx.guild)}\n"
                                                                    f"**2FA:** {utils.guild_mfa_level(ctx.guild)}\n", inline=False)
@@ -206,5 +187,5 @@ class Information(commands.Cog):
         return await ctx.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Information(bot))
+def setup(client):
+    client.add_cog(Information(client))

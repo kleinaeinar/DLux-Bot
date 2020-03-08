@@ -120,9 +120,9 @@ async def changeprefix(ctx, prefix):
         json.dump(prefixes, f, indent=4)
     await ctx.send(f'My prefix has been changed to: ``{prefix}``')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(f'That is an invalid command.')
+#@client.event
+#async def on_command_error(ctx, error):
+#    if isinstance(error, commands.CommandNotFound):
+#        await ctx.send(f'That is an invalid command.')
 
 client.run(token)
