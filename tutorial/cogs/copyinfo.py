@@ -1,0 +1,191 @@
+import inspect
+import os
+
+import discord
+import psutil
+from discord.ext import commands
+
+from utilities import utils
+
+
+class Information(commands.Cog):
+
+    def __init__(self, client):
+        self.client = client
+
+    @commands.command(name="about", aliases=["info"])
+    async def about(self, ctx):
+        """
+        Get information about the bot.
+        """
+
+        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(self.client, ctx)
+        files, functions, comments, lines, classes = utils.linecount()
+
+        embed = discord.Embed(colour=discordColour(1080748))
+
+        embed.set_author(icon_url=ctx.client.user.avatar_url_as(format="png"), name=f"{self.client.user.name}'s Info")
+        embed.set_thumbnail(url=ctx.client.user.avatar_url_as(format="png"))
+        embed.set_footer(text=f"ID: {self.client.user.id}")
+        embed.description = "This discord bot is coded by <@221070014252449792>"
+        embed.add_field(name="__**Bot info:**__", value=f"**Uptime:** {utils.format_time(self.client.uptime)}\n"
+                                                        f"**Total users:** {len(self.client.users)}\n"
+                                                        f"**Guilds:** {len(self.client.guilds)}")
+        embed.add_field(name="\u200B", value="\u200B")
+        embed.add_field(name="__**Stats:**__", value=f"**Discord.py Version:** {str(discord.__version__)}\n"
+                                                     f"**Commands:** {len(self.client.commands)}\n"
+                                                     f"**Cogs:** {len(self.client.cogs)}")
+        embed.add_field(name="__**Code:**__", value=f"**Comments:** {comments}\n**Functions:** {functions}\n"
+                                                    f"**Classes:** {classes}\n**Lines:** {lines}\n**Files:** {files}\n")
+        embed.add_field(name="\u200B", value="\u200B")
+        embed.add_field(name="__**Ping:**__", value=f"**Average Lat:** {average_latency_ms}\n**Latency:** {latency_ms}\n"
+                                                    f"**Typing:** {typing_ms}\n**Discord:** {discord_ms}")
+        embed.add_field(name="__**Links:**__", value=f"**[Bot Invite](https://discordapp.com/oauth2/authorize?client_id={self.client.user.id}&scope=bot&permissions=103926848)** | "
+                                                     f"**[Support server](https://discord.gg/xP8xsHr)** | "
+                                                     f"**[Source code](https://github.com/iDevision/Life)**", inline=False)
+        return await ctx.send(embed=embed)
+
+    @commands.command(name="system", aliases=["sys"])
+    async def system(self, ctx):
+        """
+        Get information about the system the bot is running on.
+        """
+
+        embed = discord.Embed(
+            colour=discord.Color.gold(),
+        )
+        embed.set_author(icon_url=ctx.client.user.avatar_url_as(format="png"), name=f"{self.client.user.name}'s system stats")
+        embed.set_thumbnail(url=ctx.client.user.avatar_url_as(format="png"))
+        embed.add_field(name="__**System CPU:**__", value=f"**Cores:** {psutil.cpu_count()}\n"
+                                                          f"**Usage:** {psutil.cpu_percent(interval=0.1)}%\n"
+                                                          f"**Frequency:** {round(psutil.cpu_freq().current, 2)} Mhz")
+        embed.add_field(name="\u200B", value="\u200B")
+        embed.add_field(name="__**System Memory:**__", value=f"**Total:** {round(psutil.virtual_memory().total / 1048576)} mb\n"
+                                                             f"**Used:** {round(psutil.virtual_memory().used / 1048576)} mb\n"
+                                                             f"**Available:** {round(psutil.virtual_memory().available / 1048576)} mb")
+        embed.add_field(name="__**System Disk:**__", value=f"**Total:** {round(psutil.disk_usage('/').total / 1073741824, 2)} GB\n"
+                                                           f"**Used:** {round(psutil.disk_usage('/').used / 1073741824, 2)} GB\n"
+                                                           f"**Free:** {round(psutil.disk_usage('/').free / 1073741824, 2)} GB")
+        embed.add_field(name="\u200B", value="\u200B")
+        embed.add_field(name="__**Process information:**__", value=f"**Memory usage:** {round(self.client.process.memory_full_info().rss / 1048576, 2)} mb\n"
+                                                                   f"**CPU usage:** {self.client.process.cpu_percent()}%\n"
+                                                                   f"**Threads:** {self.client.process.num_threads()}")
+        return await ctx.send(embed=embed)
+
+    @commands.command(name="ping")
+    async def ping(self, ctx):
+        """
+        Gets the bots ping.
+        """
+
+        latency_ms, average_latency_ms, typing_ms, discord_ms = await utils.ping(client, ctx)
+        return await ctx.send(f"```py\n"
+                              f"Type         |Ping\n"
+                              f"Average Lat. |{average_latency_ms}\n"
+                              f"Latency      |{latency_ms}\n"
+                              f"Typing       |{typing_ms}\n"
+                              f"Discord      |{discord_ms}\n"
+                              f"```")
+
+
+    @commands.command(name="avatar")
+    async def avatar(self, ctx, *, member: discord.Member = None):
+        """
+        Get yours or a specified members avatar.
+        `member`: The member who you want the avatar of. Can be a Mention, Name or ID
+        """
+
+        if not member:
+            member = ctx.author
+
+        embed = discord.Embed(
+            colour=discord.Color.gold(),
+            title=f"{member.name}'s Avatar",
+            description=f"[PNG]({member.avatar_url_as(size=1024, format='png')}) | "
+                        f"[JPEG]({member.avatar_url_as(size=1024, format='jpeg')}) | "
+                        f"[WEBP]({member.avatar_url_as(size=1024, format='webp')})"
+        )
+        embed.set_author(icon_url=ctx.author.avatar_url_as(format="png"), name=ctx.author.name)
+
+        if member.is_avatar_animated():
+            embed.description += f" | [GIF]({member.avatar_url_as(size=1024, format='gif')})"
+            embed.set_image(url=f"{member.avatar_url_as(size=1024, format='gif')}")
+        else:
+            embed.set_image(url=f"{member.avatar_url_as(size=1024, format='png')}")
+
+        return await ctx.send(embed=embed)
+
+    @commands.command(name="serverinfo", aliases=["guildinfo"])
+    async def serverinfo(self, ctx):
+        """
+        Get information about the current server.
+        """
+
+        online, idle, dnd, offline = utils.guild_user_status(ctx.guild)
+
+        embed = discord.Embed(
+            colour=discord.Color.gold(),
+            title=f"{ctx.guild.name}'s Stats and Information."
+        )
+        embed.set_author(icon_url=ctx.author.avatar_url_as(format="png"), name=ctx.author.name)
+        embed.set_thumbnail(url=ctx.guild.icon_url_as(format="png", size=1024))
+        embed.set_footer(text=f"ID: {ctx.guild.id}")
+        embed.add_field(name="__**General information:**__", value=f"**Owner:** {ctx.guild.owner}\n"
+                                                                   f"**Server created at:** {ctx.guild.created_at.__format__('%A %d %B %Y at %H:%M')}\n"
+                                                                   f"**Members:** {ctx.guild.member_count} |"
+                                                                   f"**Online:** {online} |"
+                                                                   f"**Away:** {idle} |"
+                                                                   f"**DnD:** {dnd} |"
+                                                                   f"**Offline:** {offline}\n"
+                                                                   f"**Verification level:** {utils.guild_verification_level(ctx.guild)}\n"
+                                                                   f"**Content filter level:** {utils.guild_content_filter_level(ctx.guild)}\n"
+                                                                   f"**2FA:** {utils.guild_mfa_level(ctx.guild)}\n", inline=False)
+        embed.add_field(name="__**Channels:**__", value=f"**Text channels:** {len(ctx.guild.text_channels)}\n"
+                                                        f"**Voice channels:** {len(ctx.guild.voice_channels)}\n"
+                                                        f"**Voice region:** {utils.guild_region(ctx.guild)}\n"
+                                                        f"**AFK timeout:** {int(ctx.guild.afk_timeout / 60)} minutes\n"
+                                                        f"**AFK channel:** {ctx.guild.afk_channel}\n", inline=False)
+
+        roles = ' '.join([r.mention for r in ctx.guild.roles[:-11:-1] if not r.name == "@everyone"])
+        role_count = len(ctx.guild.roles) - 1
+        if role_count > 10:
+            roles += f" ... and {role_count - 10} others"
+        embed.add_field(name="__**Role information:**__", value=f"**Roles:** ({role_count}) {roles}\n", inline=False)
+
+        return await ctx.send(embed=embed)
+
+    @commands.command(name="userinfo")
+    async def userinfo(self, ctx, *, member: discord.Member = None):
+        """
+        Get information about you, or a specified user.
+        `member`: The member who you want the information of. Can be a Mention, Name or ID
+        """
+
+        if member is None:
+            member = ctx.author
+
+        embed = discord.Embed(
+            colour=utils.member_colour(ctx.author),
+            title=f"{member.name}'s Stats and Information."
+        )
+        embed.set_author(icon_url=ctx.author.avatar_url_as(format="png"), name=ctx.author.name)
+        embed.set_footer(text=f"ID: {member.id}")
+        embed.set_thumbnail(url=member.avatar_url_as(format="png"))
+        embed.add_field(name="__**General information:**__", value=f"**Discord Name:** {member}\n"
+                                                                   f"**Account created:** {member.created_at.__format__('%A %d %B %Y at %H:%M')}\n"
+                                                                   f"**Status:** {utils.member_status(member)}\n"
+                                                                   f"**Activity:** {utils.member_activity(member)}", inline=False)
+
+        roles = ' '.join([r.mention for r in ctx.author.roles[:-11:-1] if not r.name == "@everyone"])
+        role_count = len(ctx.author.roles) - 1
+        if role_count > 10:
+            roles += f" ... and {role_count - 10} others"
+
+        embed.add_field(name="__**Server-related information:**__", value=f"**Nickname:** {member.nick}\n"
+                                                                          f"**Joined server:** {member.joined_at.__format__('%A %d %B %Y at %H:%M')}\n"
+                                                                          f"**Roles:** ({role_count}) {roles}", inline=False)
+        return await ctx.send(embed=embed)
+
+
+def setup(client):
+    client.add_cog(Information(client))

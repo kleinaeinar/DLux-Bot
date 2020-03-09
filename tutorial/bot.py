@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from itertools import cycle
 import asyncio
 import datetime as DT
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -66,6 +67,7 @@ async def on_guild_remove(guild):
 async def change_status():
     time_date_now = DT.datetime.now().strftime('Date: %d-%m-%Y\nTime: %H:%M:%S')
     await client.change_presence(activity=discord.Game(f'Ping: {round(client.latency * 1000)}ms'))
+    time_date_now = DT.datetime.now().strftime('Date: %d-%m-%Y\nTime: %H:%M:%S')
     print(time_date_now)
     print(f'Ping: {round(client.latency * 1000)}ms\n---------------------------')
 
@@ -119,9 +121,9 @@ async def changeprefix(ctx, prefix):
         json.dump(prefixes, f, indent=4)
     await ctx.send(f'My prefix has been changed to: ``{prefix}``')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(f'That is an invalid command.')
+#@client.event
+#async def on_command_error(ctx, error):
+#    if isinstance(error, commands.CommandNotFound):
+#        await ctx.send(f'That is an invalid command.')
 
 client.run(token)
