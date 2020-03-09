@@ -68,8 +68,6 @@ class Information(commands.Cog):
 
         await author.send(embed=embed)
 
-<<<<<<< HEAD
-=======
     @commands.command()
     async def time(self, ctx):
         time_date_now = DT.datetime.now().strftime('%H:%M:%S')
@@ -77,9 +75,5 @@ class Information(commands.Cog):
         embed.set_author(name='Time', icon_url='https://i.imgur.com/CYPtUD3.png')
         await ctx.send(embed=embed)
 
-
-
-
->>>>>>> 03f9231585fc16b0d791bad7ec4d3c4449aee47f
 def setup(client):
     client.add_cog(Information(client))
